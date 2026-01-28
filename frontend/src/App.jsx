@@ -8,46 +8,193 @@ const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:800
 const HERO_IMAGE =
   'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1800&q=80'
 
-const sampleBooks = [
+const coverPool = [
+  'https://covers.openlibrary.org/b/isbn/9780593135204-L.jpg', // Project Hail Mary
+  'https://covers.openlibrary.org/b/isbn/9781524731656-L.jpg', // Bad Blood
+  'https://covers.openlibrary.org/b/isbn/9781492670124-L.jpg', // 7 1/2 Deaths
+  'https://covers.openlibrary.org/b/isbn/9780316556347-L.jpg', // Circe
+  'https://covers.openlibrary.org/b/isbn/9780307743657-L.jpg', // The Shining
+  'https://covers.openlibrary.org/b/isbn/9780593318171-L.jpg', // Klara and the Sun
+  'https://covers.openlibrary.org/b/isbn/9780385547345-L.jpg', // Lessons in Chemistry
+  'https://covers.openlibrary.org/b/isbn/9780593321201-L.jpg', // Tomorrow and Tomorrow and Tomorrow
+  'https://covers.openlibrary.org/b/isbn/9780063021426-L.jpg', // Babel
+  'https://covers.openlibrary.org/b/isbn/9780063204157-L.jpg', // Remarkably Bright Creatures
+  'https://covers.openlibrary.org/b/isbn/9781649374042-L.jpg', // Fourth Wing
+  'https://covers.openlibrary.org/b/isbn/9780593159460-L.jpg', // The Maid
+  'https://covers.openlibrary.org/b/isbn/9780593128480-L.jpg', // A Deadly Education
+  'https://covers.openlibrary.org/b/isbn/9780735211292-L.jpg', // Atomic Habits
+  'https://covers.openlibrary.org/b/isbn/9780399590504-L.jpg', // Educated
+  'https://covers.openlibrary.org/b/isbn/9781524763138-L.jpg', // Becoming
+  'https://covers.openlibrary.org/b/isbn/9780399588198-L.jpg', // Born a Crime
+  'https://covers.openlibrary.org/b/isbn/9780062316110-L.jpg', // Sapiens
+  'https://covers.openlibrary.org/b/isbn/9780143127741-L.jpg', // Body Keeps the Score
+  'https://covers.openlibrary.org/b/isbn/9781455586691-L.jpg', // Deep Work
+  'https://covers.openlibrary.org/b/isbn/9780735214484-L.jpg', // Range
+  'https://covers.openlibrary.org/b/isbn/9780374275631-L.jpg', // Thinking Fast and Slow
+  'https://covers.openlibrary.org/b/isbn/9780316017930-L.jpg', // Outliers
+  'https://covers.openlibrary.org/b/isbn/9780593653420-L.jpg', // Creative Act
+]
+
+const baseBooks = [
+  { title: 'Bad Blood', author: 'John Carreyrou', category: 'Non-Fiction', price: 18.99, cover: 'https://covers.openlibrary.org/b/isbn/9781524731656-L.jpg', badge: 'Non-Fiction', rating: 5 },
+  { title: 'Circe', author: 'Madeline Miller', category: 'Fiction', price: 19.5, cover: 'https://covers.openlibrary.org/b/isbn/9780316556347-L.jpg', badge: 'Fiction', rating: 5 },
+  { title: 'The 7½ Deaths of Evelyn Hardcastle', author: 'Stuart Turton', category: 'Fiction', price: 14.99, cover: 'https://covers.openlibrary.org/b/isbn/9781492670124-L.jpg', badge: 'Mystery', rating: 5 },
+  { title: 'The Shining', author: 'Stephen King', category: 'Fiction', price: 18.99, cover: 'https://covers.openlibrary.org/b/isbn/9780307743657-L.jpg', badge: 'Fiction', rating: 5 },
+  { title: 'Project Hail Mary', author: 'Andy Weir', category: 'Fiction', price: 21.0, cover: 'https://covers.openlibrary.org/b/isbn/9780593135204-L.jpg', badge: 'Sci-Fi', rating: 5 },
+  { title: 'Klara and the Sun', author: 'Kazuo Ishiguro', category: 'Fiction', price: 16.99, cover: 'https://covers.openlibrary.org/b/isbn/9780593318171-L.jpg', badge: 'Literary', rating: 4 },
+  { title: 'Lessons in Chemistry', author: 'Bonnie Garmus', category: 'Fiction', price: 17.5, cover: 'https://covers.openlibrary.org/b/isbn/9780385547345-L.jpg', badge: 'Fiction', rating: 5 },
+  { title: 'Tomorrow, and Tomorrow, and Tomorrow', author: 'Gabrielle Zevin', category: 'Fiction', price: 18.25, cover: 'https://covers.openlibrary.org/b/isbn/9780593321201-L.jpg', badge: 'Fiction', rating: 5 },
+  { title: 'Babel', author: 'R. F. Kuang', category: 'Fiction', price: 20.0, cover: 'https://covers.openlibrary.org/b/isbn/9780063021426-L.jpg', badge: 'Fantasy', rating: 5 },
+  { title: 'Remarkably Bright Creatures', author: 'Shelby Van Pelt', category: 'Fiction', price: 15.75, cover: 'https://covers.openlibrary.org/b/isbn/9780063204157-L.jpg', badge: 'Fiction', rating: 4 },
+  { title: 'Fourth Wing', author: 'Rebecca Yarros', category: 'Fiction', price: 22.0, cover: 'https://covers.openlibrary.org/b/isbn/9781649374042-L.jpg', badge: 'Fantasy', rating: 4 },
+  { title: 'The Maid', author: 'Nita Prose', category: 'Fiction', price: 13.99, cover: 'https://covers.openlibrary.org/b/isbn/9780593159460-L.jpg', badge: 'Mystery', rating: 4 },
+  { title: 'A Deadly Education', author: 'Naomi Novik', category: 'Fiction', price: 12.5, cover: 'https://covers.openlibrary.org/b/isbn/9780593128480-L.jpg', badge: 'Fantasy', rating: 4 },
+  { title: 'Atomic Habits', author: 'James Clear', category: 'Non-Fiction', price: 27.0, cover: 'https://covers.openlibrary.org/b/isbn/9780735211292-L.jpg', badge: 'Non-Fiction', rating: 5 },
+  { title: 'Educated', author: 'Tara Westover', category: 'Non-Fiction', price: 16.0, cover: 'https://covers.openlibrary.org/b/isbn/9780399590504-L.jpg', badge: 'Memoir', rating: 5 },
+  { title: 'Becoming', author: 'Michelle Obama', category: 'Non-Fiction', price: 19.5, cover: 'https://covers.openlibrary.org/b/isbn/9781524763138-L.jpg', badge: 'Memoir', rating: 5 },
+  { title: 'Born a Crime', author: 'Trevor Noah', category: 'Non-Fiction', price: 17.25, cover: 'https://covers.openlibrary.org/b/isbn/9780399588198-L.jpg', badge: 'Memoir', rating: 5 },
+  { title: 'Sapiens', author: 'Yuval Noah Harari', category: 'Non-Fiction', price: 21.0, cover: 'https://covers.openlibrary.org/b/isbn/9780062316110-L.jpg', badge: 'History', rating: 5 },
+  { title: 'The Body Keeps the Score', author: 'Bessel van der Kolk', category: 'Non-Fiction', price: 18.5, cover: 'https://covers.openlibrary.org/b/isbn/9780143127741-L.jpg', badge: 'Health', rating: 5 },
+  { title: 'Deep Work', author: 'Cal Newport', category: 'Non-Fiction', price: 15.5, cover: 'https://covers.openlibrary.org/b/isbn/9781455586691-L.jpg', badge: 'Productivity', rating: 4 },
+  { title: 'Range', author: 'David Epstein', category: 'Non-Fiction', price: 14.75, cover: 'https://covers.openlibrary.org/b/isbn/9780735214484-L.jpg', badge: 'Business', rating: 4 },
+  { title: 'Thinking, Fast and Slow', author: 'Daniel Kahneman', category: 'Non-Fiction', price: 17.99, cover: 'https://covers.openlibrary.org/b/isbn/9780374275631-L.jpg', badge: 'Psychology', rating: 5 },
+  { title: 'Outliers', author: 'Malcolm Gladwell', category: 'Non-Fiction', price: 16.25, cover: 'https://covers.openlibrary.org/b/isbn/9780316017930-L.jpg', badge: 'Business', rating: 4 },
+  { title: 'The Creative Act', author: 'Rick Rubin', category: 'Non-Fiction', price: 22.5, cover: 'https://covers.openlibrary.org/b/isbn/9780593653420-L.jpg', badge: 'Creativity', rating: 5 },
+]
+
+const sampleBooks = attachCovers(
+  baseBooks.map((book, idx) => ({
+    ...book,
+    id: `sample-${idx + 1}`,
+  })),
+)
+
+const teenBooks = [
   {
-    id: 'sample-1',
-    title: 'The Shining',
-    author: 'Stephen King',
-    category: 'Fiction',
-    price: 18.99,
-    cover: 'https://images.unsplash.com/photo-1541961017774-22349e4a1271?auto=format&fit=crop&w=600&q=80',
-    badge: 'Fiction',
+    id: 'teen-1',
+    title: 'The Lightning Thief',
+    author: 'Rick Riordan',
+    category: 'Teens/Kids',
+    price: 9.99,
+    cover: 'https://covers.openlibrary.org/b/isbn/9780786838653-L.jpg',
+    badge: 'Middle Grade',
     rating: 5,
   },
   {
-    id: 'sample-2',
-    title: 'Atomic Habits',
-    author: 'James Clear',
-    category: 'Non-Fiction',
-    price: 27.0,
-    cover: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=600&q=80',
-    badge: 'Non-Fiction',
-    rating: 5,
-  },
-  {
-    id: 'sample-3',
-    title: 'Bad Blood',
-    author: 'John Carreyrou',
-    category: 'Non-Fiction',
-    price: 18.99,
-    cover: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=600&q=80',
-    badge: 'Non-Fiction',
+    id: 'teen-2',
+    title: 'A Wrinkle in Time',
+    author: 'Madeleine L. Engle',
+    category: 'Teens/Kids',
+    price: 8.5,
+    cover: 'https://covers.openlibrary.org/b/isbn/9780312367541-L.jpg',
+    badge: 'Classic',
     rating: 4,
   },
   {
-    id: 'sample-4',
-    title: 'Circe',
-    author: 'Madeline Miller',
-    category: 'Fiction',
-    price: 19.5,
-    cover: 'https://images.unsplash.com/photo-1541961017774-22349e4a1271?auto=format&fit=crop&w=600&q=80',
-    badge: 'Fiction',
+    id: 'teen-3',
+    title: 'The Hate U Give',
+    author: 'Angie Thomas',
+    category: 'Teens/Kids',
+    price: 12.99,
+    cover: 'https://covers.openlibrary.org/b/isbn/9780062498533-L.jpg',
+    badge: 'YA Fiction',
     rating: 5,
+  },
+  {
+    id: 'teen-4',
+    title: 'Amari and the Night Brothers',
+    author: 'B. B. Alston',
+    category: 'Teens/Kids',
+    price: 11.5,
+    cover: 'https://covers.openlibrary.org/b/isbn/9780062975164-L.jpg',
+    badge: 'Fantasy',
+    rating: 4,
+  },
+]
+
+const audiobookBooks = [
+  {
+    id: 'audio-1',
+    title: 'Project Hail Mary (Audio)',
+    author: 'Andy Weir',
+    category: 'Audiobooks',
+    price: 19.99,
+    cover: 'https://covers.openlibrary.org/b/isbn/9780593457370-L.jpg',
+    badge: 'Audiobook',
+    rating: 5,
+  },
+  {
+    id: 'audio-2',
+    title: 'Becoming (Audio)',
+    author: 'Michelle Obama',
+    category: 'Audiobooks',
+    price: 17.99,
+    cover: 'https://covers.openlibrary.org/b/isbn/9780525633754-L.jpg',
+    badge: 'Audiobook',
+    rating: 5,
+  },
+  {
+    id: 'audio-3',
+    title: 'Born a Crime (Audio)',
+    author: 'Trevor Noah',
+    category: 'Audiobooks',
+    price: 16.5,
+    cover: 'https://covers.openlibrary.org/b/isbn/9781478974248-L.jpg',
+    badge: 'Audiobook',
+    rating: 5,
+  },
+  {
+    id: 'audio-4',
+    title: 'The Dutch House (Audio)',
+    author: 'Ann Patchett',
+    category: 'Audiobooks',
+    price: 14.99,
+    cover: 'https://covers.openlibrary.org/b/isbn/9780062963703-L.jpg',
+    badge: 'Audiobook',
+    rating: 4,
+  },
+]
+
+const toyItems = [
+  {
+    id: 'toy-1',
+    title: 'Magnetic Tiles Starter Set',
+    author: 'STEM Play',
+    category: 'Toys & Games',
+    price: 29.99,
+    cover: 'https://images.unsplash.com/photo-1493673272479-a20888bcee10?auto=format&fit=crop&w=1200&q=80',
+    badge: 'STEM',
+    rating: 5,
+  },
+  {
+    id: 'toy-2',
+    title: 'Cozy Reading Light',
+    author: 'Night Owl',
+    category: 'Toys & Games',
+    price: 15.0,
+    cover: 'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80',
+    badge: 'Accessory',
+    rating: 4,
+  },
+  {
+    id: 'toy-3',
+    title: 'Classic Chess Set',
+    author: 'Board Games Co.',
+    category: 'Toys & Games',
+    price: 22.5,
+    cover: 'https://images.unsplash.com/photo-1519947486511-46149fa0a254?auto=format&fit=crop&w=1200&q=80',
+    badge: 'Game',
+    rating: 5,
+  },
+  {
+    id: 'toy-4',
+    title: 'Story Cubes',
+    author: 'Imagination Lab',
+    category: 'Toys & Games',
+    price: 9.5,
+    cover: 'https://images.unsplash.com/photo-1600267165506-2041cb9630c5?auto=format&fit=crop&w=1200&q=80',
+    badge: 'Creative',
+    rating: 4,
   },
 ]
 
@@ -67,13 +214,51 @@ async function fetchBooks() {
 function decorateBooks(list) {
   if (!list.length) return sampleBooks
 
-  const covers = sampleBooks.map((b) => b.cover)
+  const covers = coverPool.length ? coverPool : sampleBooks.map((b) => b.cover)
   return list.map((book, idx) => ({
     ...book,
     cover: book.cover || covers[idx % covers.length],
     badge: book.category || sampleBooks[idx % sampleBooks.length].category,
     price: book.price ?? sampleBooks[idx % sampleBooks.length].price,
   }))
+}
+
+function attachCovers(list) {
+  const pool = coverPool.length ? coverPool : sampleBooks.map((b) => b.cover).filter(Boolean)
+  return list.map((book, idx) => ({
+    ...book,
+    cover: book.cover || pool[idx % pool.length] || pool[0],
+  }))
+}
+
+function dedupeByTitle(list) {
+  const seen = new Set()
+  return list.filter((item) => {
+    const key = (item.title || '').toLowerCase()
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
+
+function normalizeCategory(cat) {
+  return (cat || '').trim().toLowerCase()
+}
+
+function isFictionCategory(cat) {
+  const c = normalizeCategory(cat)
+  if (!c) return false
+  if (c.includes('non-fiction') || c.includes('nonfiction') || c.startsWith('non ')) return false
+  const fictionKeywords = ['fiction', 'novel', 'fantasy', 'sci-fi', 'romance']
+  return fictionKeywords.some((kw) => c.includes(kw))
+}
+
+function isNonfictionCategory(cat) {
+  const c = normalizeCategory(cat)
+  if (!c) return false
+  if (c.includes('non-fiction') || c.includes('nonfiction') || c.startsWith('non ')) return true
+  const nonfictionKeywords = ['memoir', 'biography', 'history', 'business', 'self-help', 'self help']
+  return nonfictionKeywords.some((kw) => c.includes(kw))
 }
 
 function Section({ id, title, eyebrow, children, actionLabel }) {
@@ -99,6 +284,13 @@ function App() {
   const [counts, setCounts] = useState({})
 
   const totalCount = useMemo(() => Object.values(counts).reduce((sum, n) => sum + n, 0), [counts])
+
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
 
   const getKey = (book) => book.id || book.pk || book.title
 
@@ -126,10 +318,12 @@ function App() {
 
     try {
       const data = await fetchBooks()
-      setBooks(decorateBooks(data))
+      const decorated = decorateBooks(data)
+      const merged = decorated.length >= 20 ? decorated : dedupeByTitle([...decorated, ...sampleBooks])
+      setBooks(attachCovers(merged))
     } catch (err) {
       setError('Could not reach the API. Showing sample data.')
-      setBooks(sampleBooks)
+      setBooks(attachCovers(sampleBooks))
     } finally {
       setLoading(false)
     }
@@ -149,9 +343,9 @@ function App() {
     )
   }, [books, query])
 
-  const featured = filtered.slice(0, 4)
-  const fiction = filtered.filter((b) => (b.category || '').toLowerCase().includes('fiction')).slice(0, 6)
-  const nonfiction = filtered.filter((b) => (b.category || '').toLowerCase().includes('non')).slice(0, 6)
+  const featured = attachCovers(filtered.slice(0, 4))
+  const fiction = attachCovers(filtered.filter((b) => isFictionCategory(b.category || b.badge)).slice(0, 12))
+  const nonfiction = attachCovers(filtered.filter((b) => isNonfictionCategory(b.category || b.badge)).slice(0, 12))
 
   return (
     <div className="page">
@@ -183,12 +377,12 @@ function App() {
       </header>
 
       <nav className="nav">
-        <a className="nav-link active" href="#top">Home</a>
-        <a className="nav-link" href="#fiction">Fiction</a>
-        <a className="nav-link" href="#nonfiction">Non-Fiction</a>
-        <a className="nav-link" href="#teens">Teens/Kids</a>
-        <a className="nav-link" href="#audiobooks">Audiobooks</a>
-        <a className="nav-link" href="#toys">Toys &amp; Games</a>
+        <button className="nav-link active" type="button" onClick={() => scrollToSection('top')}>Home</button>
+        <button className="nav-link" type="button" onClick={() => scrollToSection('fiction')}>Fiction</button>
+        <button className="nav-link" type="button" onClick={() => scrollToSection('nonfiction')}>Non-Fiction</button>
+        <button className="nav-link" type="button" onClick={() => scrollToSection('teens')}>Teens/Kids</button>
+        <button className="nav-link" type="button" onClick={() => scrollToSection('audiobooks')}>Audiobooks</button>
+        <button className="nav-link" type="button" onClick={() => scrollToSection('toys')}>Toys &amp; Games</button>
       </nav>
 
       <div className="hero" id="top" style={{ backgroundImage: `url(${HERO_IMAGE})` }}>
@@ -198,8 +392,12 @@ function App() {
           <h1>Burt&apos;s Bookshelf</h1>
           <p>Your gateway to literary adventures.</p>
           <div className="hero-actions">
-            <button className="primary-btn" type="button">Shop Featured</button>
-            <button className="ghost-btn" type="button">Browse Categories</button>
+            <button className="primary-btn" type="button" onClick={() => scrollToSection('featured')}>
+              Shop Featured
+            </button>
+            <button className="ghost-btn" type="button" onClick={() => scrollToSection('fiction')}>
+              Browse Categories
+            </button>
           </div>
           {error ? <p className="error" role="alert">{error}</p> : null}
         </div>
@@ -222,9 +420,9 @@ function App() {
 
       <Section id="fiction" title="Fiction" eyebrow="Captivating stories" actionLabel="See more">
         <div className="grid">
-          {(fiction.length ? fiction : sampleBooks).map((book) => (
+          {attachCovers(fiction.length ? fiction : sampleBooks.filter((b) => isFictionCategory(b.category || b.badge))).map((book, idx) => (
             <BookCard
-              key={`fic-${getKey(book)}`}
+              key={`fic-${getKey(book)}-${idx}`}
               book={book}
               count={countFor(book)}
               onInc={() => increment(book)}
@@ -236,9 +434,9 @@ function App() {
 
       <Section id="nonfiction" title="Non-Fiction" eyebrow="Inspiring insights" actionLabel="See more">
         <div className="grid">
-          {(nonfiction.length ? nonfiction : sampleBooks.filter((b) => b.badge === 'Non-Fiction')).map((book) => (
+          {attachCovers(nonfiction.length ? nonfiction : sampleBooks.filter((b) => isNonfictionCategory(b.category || b.badge))).map((book, idx) => (
             <BookCard
-              key={`nf-${getKey(book)}`}
+              key={`nf-${getKey(book)}-${idx}`}
               book={book}
               count={countFor(book)}
               onInc={() => increment(book)}
@@ -249,15 +447,45 @@ function App() {
       </Section>
 
       <Section id="teens" title="Teens/Kids" eyebrow="For young readers" actionLabel="See more">
-        <p className="muted">Coming soon — browse by age and interests.</p>
+        <div className="grid">
+          {teenBooks.map((book) => (
+            <BookCard
+              key={`teen-${getKey(book)}`}
+              book={book}
+              count={countFor(book)}
+              onInc={() => increment(book)}
+              onDec={() => decrement(book)}
+            />
+          ))}
+        </div>
       </Section>
 
       <Section id="audiobooks" title="Audiobooks" eyebrow="Listen on the go" actionLabel="See more">
-        <p className="muted">Coming soon — add your favorite listens here.</p>
+        <div className="grid">
+          {audiobookBooks.map((book) => (
+            <BookCard
+              key={`audio-${getKey(book)}`}
+              book={book}
+              count={countFor(book)}
+              onInc={() => increment(book)}
+              onDec={() => decrement(book)}
+            />
+          ))}
+        </div>
       </Section>
 
       <Section id="toys" title="Toys &amp; Games" eyebrow="Gifts and play" actionLabel="See more">
-        <p className="muted">Coming soon — toys and games collection.</p>
+        <div className="grid">
+          {toyItems.map((book) => (
+            <BookCard
+              key={`toy-${getKey(book)}`}
+              book={book}
+              count={countFor(book)}
+              onInc={() => increment(book)}
+              onDec={() => decrement(book)}
+            />
+          ))}
+        </div>
       </Section>
     </div>
   )
