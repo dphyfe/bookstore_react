@@ -9,13 +9,22 @@ function Rating({ value = 0 }) {
     )
 }
 
-function BookCard({ book, count = 0, onInc, onDec }) {
+function BookCard({ book, count = 0, onInc, onDec, wishlisted = false, onToggleWishlist }) {
     const disableDec = count <= 0
 
     return (
         <article className="book-card">
-            <div className="cover" style={{ backgroundImage: `url(${book.cover})` }}>
+            <div className="cover">
+                <img src={book.cover} alt={`${book.title || 'Book'} cover`} />
                 <span className="badge">{book.badge || book.category || 'Book'}</span>
+                <button
+                    type="button"
+                    className={`wishlist-btn ${wishlisted ? 'active' : ''}`}
+                    aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+                    onClick={onToggleWishlist}
+                >
+                    {wishlisted ? '♥' : '♡'}
+                </button>
             </div>
             <div className="book-body">
                 <p className="book-title">{book.title}</p>

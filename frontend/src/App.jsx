@@ -282,6 +282,10 @@ function App() {
   const [error, setError] = useState('')
   const [query, setQuery] = useState('')
   const [counts, setCounts] = useState({})
+  const [showCart, setShowCart] = useState(false)
+  const [orderMessage, setOrderMessage] = useState('')
+  const [wishlist, setWishlist] = useState({})
+  const [showWishlist, setShowWishlist] = useState(false)
 
   const totalCount = useMemo(() => Object.values(counts).reduce((sum, n) => sum + n, 0), [counts])
 
@@ -299,6 +303,19 @@ function App() {
     return counts[key] ?? 0
   }
 
+  const toggleWishlist = (book) => {
+    const key = getKey(book)
+    setWishlist((prev) => {
+      const next = { ...prev }
+      if (next[key]) {
+        delete next[key]
+      } else {
+        next[key] = true
+      }
+      return next
+    })
+  }
+
   const increment = (book) => {
     const key = getKey(book)
     setCounts((prev) => ({ ...prev, [key]: (prev[key] ?? 0) + 1 }))
@@ -310,6 +327,23 @@ function App() {
       const next = (prev[key] ?? 0) - 1
       return { ...prev, [key]: Math.max(0, next) }
     })
+  }
+
+  const cartItems = useMemo(
+    () =>
+      books
+        .filter((book) => countFor(book) > 0)
+        .map((book) => ({ ...book, quantity: countFor(book), subtotal: (book.price ?? 0) * countFor(book) })),
+    [books, counts],
+  )
+
+  const cartTotal = useMemo(() => cartItems.reduce((sum, item) => sum + item.subtotal, 0), [cartItems])
+
+  const checkout = () => {
+    if (!cartItems.length) return
+    setOrderMessage('Order placed! Check your email for the receipt.')
+    setCounts({})
+    setShowCart(false)
   }
 
   const load = async () => {
@@ -343,6 +377,11 @@ function App() {
     )
   }, [books, query])
 
+  const wishlistItems = useMemo(
+    () => books.filter((book) => wishlist[getKey(book)]),
+    [books, wishlist],
+  )
+
   const featured = attachCovers(filtered.slice(0, 4))
   const fiction = attachCovers(filtered.filter((b) => isFictionCategory(b.category || b.badge)).slice(0, 12))
   const nonfiction = attachCovers(filtered.filter((b) => isNonfictionCategory(b.category || b.badge)).slice(0, 12))
@@ -368,8 +407,15 @@ function App() {
         </div>
         <div className="nav-actions">
           <button className="ghost-btn" type="button">My Account</button>
-          <button className="ghost-btn" type="button">Wishlist</button>
-          <button className="ghost-btn cart-btn" type="button">
+          <button className="ghost-btn wishlist-btn-top" type="button" onClick={() => setShowWishlist((prev) => !prev)}>
+            Wishlist
+            {wishlistItems.length > 0 ? (
+              <span className="wishlist-badge" aria-label={`${wishlistItems.length} wishlisted`}>
+                {wishlistItems.length}
+              </span>
+            ) : null}
+          </button>
+          <button className="ghost-btn cart-btn" type="button" onClick={() => setShowCart(true)}>
             Cart
             {totalCount > 0 ? <span className="cart-badge" aria-label={`${totalCount} books in cart`}>{totalCount}</span> : null}
           </button>
@@ -384,6 +430,34 @@ function App() {
         <button className="nav-link" type="button" onClick={() => scrollToSection('audiobooks')}>Audiobooks</button>
         <button className="nav-link" type="button" onClick={() => scrollToSection('toys')}>Toys &amp; Games</button>
       </nav>
+
+      {orderMessage ? <p className="success" role="status">{orderMessage}</p> : null}
+
+      {showWishlist ? (
+        <div className="wishlist-strip" aria-label="Wishlist">
+          <div className="wishlist-head">
+            <span className="eyebrow">Wishlist</span>
+            <span className="wishlist-count">{wishlistItems.length} saved</span>
+          </div>
+          {wishlistItems.length ? (
+            <div className="wishlist-chips">
+              {wishlistItems.map((item) => (
+                <button
+                  key={`wish-${getKey(item)}`}
+                  type="button"
+                  className="wishlist-chip"
+                  onClick={() => toggleWishlist(item)}
+                >
+                  <span className="chip-title">{item.title}</span>
+                  <span aria-hidden="true">✕</span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="muted wishlist-empty">Tap the heart on any book to save it here.</p>
+          )}
+        </div>
+      ) : null}
 
       <div className="hero" id="top" style={{ backgroundImage: `url(${HERO_IMAGE})` }}>
         <div className="hero-overlay" />
@@ -410,6 +484,8 @@ function App() {
             <BookCard
               key={getKey(book)}
               book={book}
+              wishlisted={Boolean(wishlist[getKey(book)])}
+              onToggleWishlist={() => toggleWishlist(book)}
               count={countFor(book)}
               onInc={() => increment(book)}
               onDec={() => decrement(book)}
@@ -424,6 +500,8 @@ function App() {
             <BookCard
               key={`fic-${getKey(book)}-${idx}`}
               book={book}
+              wishlisted={Boolean(wishlist[getKey(book)])}
+              onToggleWishlist={() => toggleWishlist(book)}
               count={countFor(book)}
               onInc={() => increment(book)}
               onDec={() => decrement(book)}
@@ -438,6 +516,8 @@ function App() {
             <BookCard
               key={`nf-${getKey(book)}-${idx}`}
               book={book}
+              wishlisted={Boolean(wishlist[getKey(book)])}
+              onToggleWishlist={() => toggleWishlist(book)}
               count={countFor(book)}
               onInc={() => increment(book)}
               onDec={() => decrement(book)}
@@ -452,6 +532,8 @@ function App() {
             <BookCard
               key={`teen-${getKey(book)}`}
               book={book}
+              wishlisted={Boolean(wishlist[getKey(book)])}
+              onToggleWishlist={() => toggleWishlist(book)}
               count={countFor(book)}
               onInc={() => increment(book)}
               onDec={() => decrement(book)}
@@ -466,6 +548,8 @@ function App() {
             <BookCard
               key={`audio-${getKey(book)}`}
               book={book}
+              wishlisted={Boolean(wishlist[getKey(book)])}
+              onToggleWishlist={() => toggleWishlist(book)}
               count={countFor(book)}
               onInc={() => increment(book)}
               onDec={() => decrement(book)}
@@ -480,6 +564,8 @@ function App() {
             <BookCard
               key={`toy-${getKey(book)}`}
               book={book}
+              wishlisted={Boolean(wishlist[getKey(book)])}
+              onToggleWishlist={() => toggleWishlist(book)}
               count={countFor(book)}
               onInc={() => increment(book)}
               onDec={() => decrement(book)}
@@ -487,6 +573,56 @@ function App() {
           ))}
         </div>
       </Section>
+
+      {showCart ? <div className="cart-overlay" onClick={() => setShowCart(false)} /> : null}
+
+      <aside className={`cart-drawer ${showCart ? 'open' : ''}`} role="dialog" aria-label="Shopping cart">
+        <div className="cart-header">
+          <div>
+            <p className="eyebrow">Shopping Cart</p>
+            <h3 className="cart-title">Your picks ({totalCount})</h3>
+          </div>
+          <button className="ghost-btn" type="button" onClick={() => setShowCart(false)}>Close</button>
+        </div>
+
+        {cartItems.length ? (
+          <ul className="cart-list">
+            {cartItems.map((item) => (
+              <li key={getKey(item)} className="cart-item">
+                <img src={item.cover} alt={`${item.title || 'Book'} cover`} className="cart-thumb" />
+                <div className="cart-item-details">
+                  <p className="book-title cart-item-title">{item.title}</p>
+                  <p className="book-author cart-item-author">{item.author || 'Unknown author'}</p>
+                  <div className="cart-qty-row">
+                    <div className="counter">
+                      <button type="button" className="counter-btn" onClick={() => decrement(item)} aria-label="Decrease quantity">
+                        ↓
+                      </button>
+                      <span className="counter-value" aria-live="polite">{item.quantity}</span>
+                      <button type="button" className="counter-btn" onClick={() => increment(item)} aria-label="Increase quantity">
+                        ↑
+                      </button>
+                    </div>
+                    <span className="cart-subtotal">${item.subtotal.toFixed(2)}</span>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="muted empty-cart">Your cart is empty.</p>
+        )}
+
+        <div className="cart-footer">
+          <div className="cart-total-row">
+            <span>Total</span>
+            <span>${cartTotal.toFixed(2)}</span>
+          </div>
+          <button className="primary-btn" type="button" onClick={checkout} disabled={!cartItems.length}>
+            Place Order
+          </button>
+        </div>
+      </aside>
     </div>
   )
 }
