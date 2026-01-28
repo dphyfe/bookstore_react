@@ -20,8 +20,10 @@ function BookCard({ book, count = 0, onInc, onDec }) {
             <div className="book-body">
                 <p className="book-title">{book.title}</p>
                 <p className="book-author">{book.author || 'Unknown author'}</p>
-                <Rating value={book.rating || 5} />
-                <p className="book-price">${Number(book.price ?? 0).toFixed(2)}</p>
+                <div className="meta-row">
+                    <Rating value={book.rating || 5} />
+                    <p className="book-price">${Number(book.price ?? 0).toFixed(2)}</p>
+                </div>
                 <div className="counter">
                     <button type="button" className="counter-btn" onClick={onDec} disabled={disableDec} aria-label="Decrease quantity">
                         ↓
