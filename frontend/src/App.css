@@ -4,9 +4,10 @@
 }
 
 .page {
+  --page-pad: 24px;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 16px 24px 64px;
+  padding: 16px var(--page-pad) 64px;
 }
 
 .topbar {
@@ -125,7 +126,8 @@
   border-radius: 18px;
   overflow: hidden;
   min-height: 320px;
-  margin: 12px 0 28px;
+  margin: 12px calc(var(--page-pad) * -1) 28px;
+  width: calc(100% + var(--page-pad) * 2);
   background-size: cover;
   background-position: center;
 }
@@ -595,4 +597,90 @@
   gap: 10px;
   position: sticky;
   top: 16px;
+}
+
+.about-block {
+  margin: 40px 0 12px;
+  border: 1px solid #12233d;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #0c152b;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.about-hero {
+  padding: 36px 28px;
+  background: linear-gradient(135deg, #0f2648, #0b1730);
+  text-align: center;
+  display: grid;
+  gap: 10px;
+}
+
+.about-hero h2 {
+  margin: 0;
+  color: #f6f7fb;
+}
+
+.about-hero p {
+  margin: 0;
+  color: #d6ddf7;
+}
+
+.about-footer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  padding: 24px 28px;
+  background: #0e1424;
+}
+
+.about-col {
+  display: grid;
+  gap: 10px;
+  color: #e5ecff;
+}
+
+.about-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.about-heading {
+  margin: 0;
+  color: #c9d4ff;
+  font-weight: 700;
+}
+
+.about-links {
+  display: grid;
+  gap: 6px;
+}
+
+.about-links a {
+  color: #e5ecff;
+  text-decoration: none;
+}
+
+.about-links a:hover {
+  color: #f59e0b;
+}
+
+.about-contact {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 6px;
+  color: #c9d4ff;
+}
+
+.about-meta {
+  padding: 12px 28px 16px;
+  border-top: 1px solid #12233d;
+  background: #0d111d;
+  color: #8ea0c2;
+  text-align: center;
+  font-size: 14px;
 }

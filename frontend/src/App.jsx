@@ -159,42 +159,52 @@ const audiobookBooks = [
 const toyItems = [
   {
     id: 'toy-1',
-    title: 'Magnetic Tiles Starter Set',
-    author: 'STEM Play',
+    title: 'Monopoly Classic',
+    author: 'Hasbro',
     category: 'Toys & Games',
-    price: 29.99,
-    cover: 'https://images.unsplash.com/photo-1493673272479-a20888bcee10?auto=format&fit=crop&w=1200&q=80',
-    badge: 'STEM',
+    price: 24.0,
+    cover: 'https://images.pexels.com/photos/131616/pexels-photo-131616.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    badge: 'Classic',
     rating: 5,
   },
   {
     id: 'toy-2',
-    title: 'Cozy Reading Light',
-    author: 'Night Owl',
+    title: 'The Game of Life',
+    author: 'Hasbro',
     category: 'Toys & Games',
-    price: 15.0,
-    cover: 'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80',
-    badge: 'Accessory',
+    price: 27.0,
+    cover: 'https://images.pexels.com/photos/411207/pexels-photo-411207.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    badge: 'Family',
     rating: 4,
   },
   {
     id: 'toy-3',
-    title: 'Classic Chess Set',
-    author: 'Board Games Co.',
+    title: 'Chess Club Set',
+    author: 'Classic Tabletop',
     category: 'Toys & Games',
-    price: 22.5,
-    cover: 'https://images.unsplash.com/photo-1519947486511-46149fa0a254?auto=format&fit=crop&w=1200&q=80',
-    badge: 'Game',
+    price: 21.0,
+    cover: 'https://images.unsplash.com/photo-1504274066651-8d31a536b11a?auto=format&fit=crop&w=1200&q=80',
+    badge: 'Strategy',
     rating: 5,
   },
   {
     id: 'toy-4',
-    title: 'Story Cubes',
-    author: 'Imagination Lab',
+    title: 'Checkers Deluxe',
+    author: 'Heritage Games',
     category: 'Toys & Games',
-    price: 9.5,
-    cover: 'https://images.unsplash.com/photo-1600267165506-2041cb9630c5?auto=format&fit=crop&w=1200&q=80',
-    badge: 'Creative',
+    price: 16.0,
+    cover: 'https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    badge: 'Classic',
+    rating: 4,
+  },
+  {
+    id: 'toy-5',
+    title: 'Candy Land',
+    author: 'Hasbro',
+    category: 'Toys & Games',
+    price: 19.0,
+    cover: 'https://images.pexels.com/photos/33715/sweets-candies-colorful-dessert.jpg?auto=compress&cs=tinysrgb&w=1200',
+    badge: 'Family',
     rating: 4,
   },
 ]
@@ -234,7 +244,6 @@ function attachCovers(list) {
 
 function evenSlice(list, limit) {
   const copy = limit ? list.slice(0, limit) : list.slice()
-  if (copy.length % 2 === 1) copy.pop()
   return copy
 }
 
@@ -305,9 +314,10 @@ function CategoryPage({ title, eyebrow, books, getKey, wishlist, toggleWishlist,
   )
 }
 
-function CartPage({ cartItems, cartTotal, increment, decrement, getKey, checkout }) {
+function CartPage({ cartItems, cartTotal, increment, decrement, getKey, checkout, orderMessage }) {
   return (
     <Section id="cart" title="Shopping Cart" eyebrow="Review and checkout">
+      {orderMessage ? <p className="success" role="status">{orderMessage}</p> : null}
       {cartItems.length ? (
         <div className="cart-page">
           <div className="cart-list cart-list-page">
@@ -523,8 +533,6 @@ function App() {
         <NavLink className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} to="/toys">Toys &amp; Games</NavLink>
       </nav>
 
-      {orderMessage ? <p className="success" role="status">{orderMessage}</p> : null}
-
       {showWishlist ? (
         <div className="wishlist-strip" aria-label="Wishlist">
           <div className="wishlist-head">
@@ -590,6 +598,51 @@ function App() {
                   ))}
                 </div>
               </Section>
+
+              <section className="about-block" aria-labelledby="about-burts-bookshelf">
+                <div className="about-hero">
+                  <h2 id="about-burts-bookshelf">About Burt&apos;s Bookshelf</h2>
+                  <p>
+                    For over 20 years, Burt&apos;s Bookshelf has been serving the community with quality books and exceptional
+                    service. We pride ourselves on our carefully curated selection and personalized recommendations.
+                  </p>
+                  <p>
+                    Whether you&apos;re looking for the latest bestseller, a classic novel, or educational materials for your
+                    children, we have something for everyone.
+                  </p>
+                </div>
+
+                <div className="about-footer">
+                  <div className="about-col">
+                    <div className="about-brand">
+                      <span aria-hidden="true">📚</span>
+                      <span>Burt&apos;s Bookshelf</span>
+                    </div>
+                    <p className="muted">Your local bookstore for all your reading needs.</p>
+                  </div>
+
+                  <div className="about-col">
+                    <p className="about-heading">Quick Links</p>
+                    <nav className="about-links" aria-label="Quick links">
+                      <NavLink to="/">Home</NavLink>
+                      <NavLink to="/fiction">Fiction</NavLink>
+                      <NavLink to="/non-fiction">Non-Fiction</NavLink>
+                      <NavLink to="/teens">Teens/Kids</NavLink>
+                    </nav>
+                  </div>
+
+                  <div className="about-col">
+                    <p className="about-heading">Contact Us</p>
+                    <ul className="about-contact">
+                      <li>123 Book Street, Reading City</li>
+                      <li>(555) 123-4567</li>
+                      <li>info@burtsbookshelf.com</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="about-meta">© 2025 Burt&apos;s Bookshelf. All rights reserved.</div>
+              </section>
             </>
           )}
         />
@@ -689,6 +742,7 @@ function App() {
               decrement={decrement}
               getKey={getKey}
               checkout={checkout}
+              orderMessage={orderMessage}
             />
           )}
         />
