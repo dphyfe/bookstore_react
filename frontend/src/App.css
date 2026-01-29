@@ -566,3 +566,33 @@
   font-weight: 700;
   color: #f6f7fb;
 }
+
+.cart-page {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 16px;
+  align-items: start;
+}
+
+.cart-list-page {
+  background: #0f152a;
+  border: 1px solid #1b2744;
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.cart-item-page {
+  grid-template-columns: 90px 1fr;
+  padding: 12px;
+}
+
+.cart-summary {
+  background: #0f152a;
+  border: 1px solid #1b2744;
+  border-radius: 14px;
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+  position: sticky;
+  top: 16px;
+}

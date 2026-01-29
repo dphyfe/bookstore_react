@@ -305,13 +305,57 @@ function CategoryPage({ title, eyebrow, books, getKey, wishlist, toggleWishlist,
   )
 }
 
+function CartPage({ cartItems, cartTotal, increment, decrement, getKey, checkout }) {
+  return (
+    <Section id="cart" title="Shopping Cart" eyebrow="Review and checkout">
+      {cartItems.length ? (
+        <div className="cart-page">
+          <div className="cart-list cart-list-page">
+            {cartItems.map((item) => (
+              <div key={getKey(item)} className="cart-item cart-item-page">
+                <img src={item.cover} alt={`${item.title || 'Book'} cover`} className="cart-thumb" />
+                <div className="cart-item-details">
+                  <p className="book-title cart-item-title">{item.title}</p>
+                  <p className="book-author cart-item-author">{item.author || 'Unknown author'}</p>
+                  <div className="cart-qty-row">
+                    <div className="counter">
+                      <button type="button" className="counter-btn" onClick={() => decrement(item)} aria-label="Decrease quantity">
+                        ↓
+                      </button>
+                      <span className="counter-value" aria-live="polite">{item.quantity}</span>
+                      <button type="button" className="counter-btn" onClick={() => increment(item)} aria-label="Increase quantity">
+                        ↑
+                      </button>
+                    </div>
+                    <span className="cart-subtotal">${item.subtotal.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="cart-summary">
+            <div className="cart-total-row">
+              <span>Total</span>
+              <span>${cartTotal.toFixed(2)}</span>
+            </div>
+            <button className="primary-btn" type="button" onClick={checkout} disabled={!cartItems.length}>
+              Place Order
+            </button>
+          </div>
+        </div>
+      ) : (
+        <p className="muted empty-cart">Your cart is empty.</p>
+      )}
+    </Section>
+  )
+}
+
 function App() {
   const [books, setBooks] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [query, setQuery] = useState('')
   const [counts, setCounts] = useState({})
-  const [showCart, setShowCart] = useState(false)
   const [orderMessage, setOrderMessage] = useState('')
   const [wishlist, setWishlist] = useState({})
   const [showWishlist, setShowWishlist] = useState(false)
@@ -463,7 +507,7 @@ function App() {
               </span>
             ) : null}
           </button>
-          <button className="ghost-btn cart-btn" type="button" onClick={() => setShowCart(true)}>
+          <button className="ghost-btn cart-btn" type="button" onClick={() => navigate('/cart')}>
             Cart
             {totalCount > 0 ? <span className="cart-badge" aria-label={`${totalCount} books in cart`}>{totalCount}</span> : null}
           </button>
@@ -634,57 +678,21 @@ function App() {
             />
           )}
         />
+
+        <Route
+          path="/cart"
+          element={(
+            <CartPage
+              cartItems={cartItems}
+              cartTotal={cartTotal}
+              increment={increment}
+              decrement={decrement}
+              getKey={getKey}
+              checkout={checkout}
+            />
+          )}
+        />
       </Routes>
-
-      {showCart ? <div className="cart-overlay" onClick={() => setShowCart(false)} /> : null}
-
-      <aside className={`cart-drawer ${showCart ? 'open' : ''}`} role="dialog" aria-label="Shopping cart">
-        <div className="cart-header">
-          <div>
-            <p className="eyebrow">Shopping Cart</p>
-            <h3 className="cart-title">Your picks ({totalCount})</h3>
-          </div>
-          <button className="ghost-btn" type="button" onClick={() => setShowCart(false)}>Close</button>
-        </div>
-
-        {cartItems.length ? (
-          <ul className="cart-list">
-            {cartItems.map((item) => (
-              <li key={getKey(item)} className="cart-item">
-                <img src={item.cover} alt={`${item.title || 'Book'} cover`} className="cart-thumb" />
-                <div className="cart-item-details">
-                  <p className="book-title cart-item-title">{item.title}</p>
-                  <p className="book-author cart-item-author">{item.author || 'Unknown author'}</p>
-                  <div className="cart-qty-row">
-                    <div className="counter">
-                      <button type="button" className="counter-btn" onClick={() => decrement(item)} aria-label="Decrease quantity">
-                        ↓
-                      </button>
-                      <span className="counter-value" aria-live="polite">{item.quantity}</span>
-                      <button type="button" className="counter-btn" onClick={() => increment(item)} aria-label="Increase quantity">
-                        ↑
-                      </button>
-                    </div>
-                    <span className="cart-subtotal">${item.subtotal.toFixed(2)}</span>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="muted empty-cart">Your cart is empty.</p>
-        )}
-
-        <div className="cart-footer">
-          <div className="cart-total-row">
-            <span>Total</span>
-            <span>${cartTotal.toFixed(2)}</span>
-          </div>
-          <button className="primary-btn" type="button" onClick={checkout} disabled={!cartItems.length}>
-            Place Order
-          </button>
-        </div>
-      </aside>
     </div>
   )
 }
