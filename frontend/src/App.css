@@ -168,11 +168,15 @@
   cursor: pointer;
   padding: 8px 0;
   text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 6px 10px;
 }
 
 .nav-link.active,
 .nav-link:hover {
   color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.35);
 }
 
 .hero {
@@ -449,15 +453,15 @@
   }
 
   .nav {
-    gap: 8px 12px;
+    gap: 8px;
     flex-wrap: wrap;
     justify-content: center;
-    padding: 8px 0 12px;
+    padding: 8px 0 10px;
   }
 
   .nav-link {
     font-size: 14px;
-    padding: 6px 2px;
+    padding: 6px 10px;
     white-space: nowrap;
   }
 
@@ -830,4 +834,21 @@
   color: #8ea0c2;
   text-align: center;
   font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .nav {
+    gap: 2px;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow: visible;
+    padding: 4px 0 6px;
+  }
+
+  .nav-link {
+    font-size: 11px;
+    padding: 3px 4px;
+    min-width: auto;
+    flex-shrink: 1;
+  }
 }

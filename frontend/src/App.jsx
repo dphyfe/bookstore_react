@@ -37,6 +37,7 @@ const coverPool = [
 ]
 
 const baseBooks = [
+  { title: 'Educated', author: 'Tara Westover', category: 'Non-Fiction', price: 16.0, cover: 'https://covers.openlibrary.org/b/isbn/9780399590504-L.jpg', badge: 'Memoir', rating: 5 },
   { title: 'Bad Blood', author: 'John Carreyrou', category: 'Non-Fiction', price: 18.99, cover: 'https://covers.openlibrary.org/b/isbn/9781524731656-L.jpg', badge: 'Non-Fiction', rating: 5 },
   { title: 'Circe', author: 'Madeline Miller', category: 'Fiction', price: 19.5, cover: 'https://covers.openlibrary.org/b/isbn/9780316556347-L.jpg', badge: 'Fiction', rating: 5 },
   { title: 'The 7½ Deaths of Evelyn Hardcastle', author: 'Stuart Turton', category: 'Fiction', price: 14.99, cover: 'https://covers.openlibrary.org/b/isbn/9781492670124-L.jpg', badge: 'Mystery', rating: 5 },
@@ -51,7 +52,6 @@ const baseBooks = [
   { title: 'The Maid', author: 'Nita Prose', category: 'Fiction', price: 13.99, cover: 'https://covers.openlibrary.org/b/isbn/9780593159460-L.jpg', badge: 'Mystery', rating: 4 },
   { title: 'A Deadly Education', author: 'Naomi Novik', category: 'Fiction', price: 12.5, cover: 'https://covers.openlibrary.org/b/isbn/9780593128480-L.jpg', badge: 'Fantasy', rating: 4 },
   { title: 'Atomic Habits', author: 'James Clear', category: 'Non-Fiction', price: 27.0, cover: 'https://covers.openlibrary.org/b/isbn/9780735211292-L.jpg', badge: 'Non-Fiction', rating: 5 },
-  { title: 'Educated', author: 'Tara Westover', category: 'Non-Fiction', price: 16.0, cover: 'https://covers.openlibrary.org/b/isbn/9780399590504-L.jpg', badge: 'Memoir', rating: 5 },
   { title: 'Becoming', author: 'Michelle Obama', category: 'Non-Fiction', price: 19.5, cover: 'https://covers.openlibrary.org/b/isbn/9781524763138-L.jpg', badge: 'Memoir', rating: 5 },
   { title: 'Born a Crime', author: 'Trevor Noah', category: 'Non-Fiction', price: 17.25, cover: 'https://covers.openlibrary.org/b/isbn/9780399588198-L.jpg', badge: 'Memoir', rating: 5 },
   { title: 'Sapiens', author: 'Yuval Noah Harari', category: 'Non-Fiction', price: 21.0, cover: 'https://covers.openlibrary.org/b/isbn/9780062316110-L.jpg', badge: 'History', rating: 5 },
@@ -61,6 +61,8 @@ const baseBooks = [
   { title: 'Thinking, Fast and Slow', author: 'Daniel Kahneman', category: 'Non-Fiction', price: 17.99, cover: 'https://covers.openlibrary.org/b/isbn/9780374275631-L.jpg', badge: 'Psychology', rating: 5 },
   { title: 'Outliers', author: 'Malcolm Gladwell', category: 'Non-Fiction', price: 16.25, cover: 'https://covers.openlibrary.org/b/isbn/9780316017930-L.jpg', badge: 'Business', rating: 4 },
   { title: 'The Creative Act', author: 'Rick Rubin', category: 'Non-Fiction', price: 22.5, cover: 'https://covers.openlibrary.org/b/isbn/9780593653420-L.jpg', badge: 'Creativity', rating: 5 },
+  { title: 'The Midnight Library', author: 'Matt Haig', category: 'Fiction', price: 16.5, cover: 'https://covers.openlibrary.org/b/isbn/9780525559474-L.jpg', badge: 'Fiction', rating: 5 },
+  { title: 'The Night Circus', author: 'Erin Morgenstern', category: 'Fiction', price: 15.0, cover: 'https://covers.openlibrary.org/b/isbn/9780307744432-L.jpg', badge: 'Fantasy', rating: 5 },
 ]
 
 const sampleBooks = attachCovers(
@@ -489,8 +491,8 @@ function App() {
   const fictionPool = filtered.filter((b) => isFictionCategory(b.category || b.badge))
   const nonfictionPool = filtered.filter((b) => isNonfictionCategory(b.category || b.badge))
 
-  const featuredPool = filtered.length >= 10 ? filtered : dedupeByTitle([...filtered, ...sampleBooks])
-  const featured = evenSlice(attachCovers(featuredPool.slice(0, 10)), 10)
+  const featuredPool = dedupeByTitle([...sampleBooks, ...filtered])
+  const featured = evenSlice(attachCovers(featuredPool.slice(0, 12)), 12)
   const fiction = evenSlice(
     attachCovers(fictionPool.length ? fictionPool : sampleBooks.filter((b) => isFictionCategory(b.category || b.badge))),
     12,
