@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import './App.css'
 import BookCard from './components/BookCard'
 
@@ -231,6 +232,12 @@ function attachCovers(list) {
   }))
 }
 
+function evenSlice(list, limit) {
+  const copy = limit ? list.slice(0, limit) : list.slice()
+  if (copy.length % 2 === 1) copy.pop()
+  return copy
+}
+
 function dedupeByTitle(list) {
   const seen = new Set()
   return list.filter((item) => {
@@ -276,6 +283,28 @@ function Section({ id, title, eyebrow, children, actionLabel }) {
   )
 }
 
+function CategoryPage({ title, eyebrow, books, getKey, wishlist, toggleWishlist, countFor, increment, decrement }) {
+  const display = evenSlice(attachCovers(books))
+
+  return (
+    <Section id={title.toLowerCase()} title={title} eyebrow={eyebrow}>
+      <div className="grid">
+        {display.map((book, idx) => (
+          <BookCard
+            key={`${title}-${getKey(book)}-${idx}`}
+            book={book}
+            wishlisted={Boolean(wishlist[getKey(book)])}
+            onToggleWishlist={() => toggleWishlist(book)}
+            count={countFor(book)}
+            onInc={() => increment(book)}
+            onDec={() => decrement(book)}
+          />
+        ))}
+      </div>
+    </Section>
+  )
+}
+
 function App() {
   const [books, setBooks] = useState([])
   const [loading, setLoading] = useState(true)
@@ -286,15 +315,10 @@ function App() {
   const [orderMessage, setOrderMessage] = useState('')
   const [wishlist, setWishlist] = useState({})
   const [showWishlist, setShowWishlist] = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const totalCount = useMemo(() => Object.values(counts).reduce((sum, n) => sum + n, 0), [counts])
-
-  const scrollToSection = (id) => {
-    const el = document.getElementById(id)
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
-  }
 
   const getKey = (book) => book.id || book.pk || book.title
 
@@ -339,6 +363,15 @@ function App() {
 
   const cartTotal = useMemo(() => cartItems.reduce((sum, item) => sum + item.subtotal, 0), [cartItems])
 
+  const goToFeatured = () => {
+    if (location.pathname !== '/') {
+      navigate('/')
+      return
+    }
+    const el = document.getElementById('featured')
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   const checkout = () => {
     if (!cartItems.length) return
     setOrderMessage('Order placed! Check your email for the receipt.')
@@ -382,16 +415,31 @@ function App() {
     [books, wishlist],
   )
 
-  const featured = attachCovers(filtered.slice(0, 4))
-  const fiction = attachCovers(filtered.filter((b) => isFictionCategory(b.category || b.badge)).slice(0, 12))
-  const nonfiction = attachCovers(filtered.filter((b) => isNonfictionCategory(b.category || b.badge)).slice(0, 12))
+  const fictionPool = filtered.filter((b) => isFictionCategory(b.category || b.badge))
+  const nonfictionPool = filtered.filter((b) => isNonfictionCategory(b.category || b.badge))
+
+  const featuredPool = filtered.length >= 10 ? filtered : dedupeByTitle([...filtered, ...sampleBooks])
+  const featured = evenSlice(attachCovers(featuredPool.slice(0, 10)), 10)
+  const fiction = evenSlice(
+    attachCovers(fictionPool.length ? fictionPool : sampleBooks.filter((b) => isFictionCategory(b.category || b.badge))),
+    12,
+  )
+  const nonfiction = evenSlice(
+    attachCovers(
+      nonfictionPool.length ? nonfictionPool : sampleBooks.filter((b) => isNonfictionCategory(b.category || b.badge)),
+    ),
+    12,
+  )
+  const teens = evenSlice(attachCovers(teenBooks), 12)
+  const audiobooksList = evenSlice(attachCovers(audiobookBooks), 12)
+  const toys = evenSlice(attachCovers(toyItems), 12)
 
   return (
     <div className="page">
       <header className="topbar">
         <div className="brand">
           <span className="brand-icon" aria-hidden="true">📚</span>
-          <span className="brand-name">Burt&apos;s Bookshelf</span>
+          <button type="button" className="brand-name" onClick={() => navigate('/')}>Burt&apos;s Bookshelf</button>
         </div>
         <div className="top-actions">
           <input
@@ -423,12 +471,12 @@ function App() {
       </header>
 
       <nav className="nav">
-        <button className="nav-link active" type="button" onClick={() => scrollToSection('top')}>Home</button>
-        <button className="nav-link" type="button" onClick={() => scrollToSection('fiction')}>Fiction</button>
-        <button className="nav-link" type="button" onClick={() => scrollToSection('nonfiction')}>Non-Fiction</button>
-        <button className="nav-link" type="button" onClick={() => scrollToSection('teens')}>Teens/Kids</button>
-        <button className="nav-link" type="button" onClick={() => scrollToSection('audiobooks')}>Audiobooks</button>
-        <button className="nav-link" type="button" onClick={() => scrollToSection('toys')}>Toys &amp; Games</button>
+        <NavLink className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} to="/">Home</NavLink>
+        <NavLink className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} to="/fiction">Fiction</NavLink>
+        <NavLink className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} to="/non-fiction">Non-Fiction</NavLink>
+        <NavLink className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} to="/teens">Teens/Kids</NavLink>
+        <NavLink className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} to="/audiobooks">Audiobooks</NavLink>
+        <NavLink className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} to="/toys">Toys &amp; Games</NavLink>
       </nav>
 
       {orderMessage ? <p className="success" role="status">{orderMessage}</p> : null}
@@ -459,120 +507,134 @@ function App() {
         </div>
       ) : null}
 
-      <div className="hero" id="top" style={{ backgroundImage: `url(${HERO_IMAGE})` }}>
-        <div className="hero-overlay" />
-        <div className="hero-body">
-          <span className="hero-icon" aria-hidden="true">📖</span>
-          <h1>Burt&apos;s Bookshelf</h1>
-          <p>Your gateway to literary adventures.</p>
-          <div className="hero-actions">
-            <button className="primary-btn" type="button" onClick={() => scrollToSection('featured')}>
-              Shop Featured
-            </button>
-            <button className="ghost-btn" type="button" onClick={() => scrollToSection('fiction')}>
-              Browse Categories
-            </button>
-          </div>
-          {error ? <p className="error" role="alert">{error}</p> : null}
-        </div>
-      </div>
+      <Routes>
+        <Route
+          path="/"
+          element={(
+            <>
+              <div className="hero" id="top" style={{ backgroundImage: `url(${HERO_IMAGE})` }}>
+                <div className="hero-overlay" />
+                <div className="hero-body">
+                  <span className="hero-icon" aria-hidden="true">📖</span>
+                  <h1>Burt&apos;s Bookshelf</h1>
+                  <p>Your gateway to literary adventures.</p>
+                  <div className="hero-actions">
+                    <button className="primary-btn" type="button" onClick={goToFeatured}>
+                      Shop Featured
+                    </button>
+                    <button className="ghost-btn" type="button" onClick={() => navigate('/fiction')}>
+                      Browse Categories
+                    </button>
+                  </div>
+                  {error ? <p className="error" role="alert">{error}</p> : null}
+                </div>
+              </div>
 
-      <Section id="featured" title="Featured Books" eyebrow="Curated picks" actionLabel="View all">
-        {loading ? <p className="muted">Loading books…</p> : null}
-        <div className="grid">
-          {featured.map((book) => (
-            <BookCard
-              key={getKey(book)}
-              book={book}
-              wishlisted={Boolean(wishlist[getKey(book)])}
-              onToggleWishlist={() => toggleWishlist(book)}
-              count={countFor(book)}
-              onInc={() => increment(book)}
-              onDec={() => decrement(book)}
-            />
-          ))}
-        </div>
-      </Section>
+              <Section id="featured" title="Featured Books" eyebrow="Curated picks" actionLabel="View all">
+                {loading ? <p className="muted">Loading books…</p> : null}
+                <div className="grid">
+                  {featured.map((book) => (
+                    <BookCard
+                      key={getKey(book)}
+                      book={book}
+                      wishlisted={Boolean(wishlist[getKey(book)])}
+                      onToggleWishlist={() => toggleWishlist(book)}
+                      count={countFor(book)}
+                      onInc={() => increment(book)}
+                      onDec={() => decrement(book)}
+                    />
+                  ))}
+                </div>
+              </Section>
+            </>
+          )}
+        />
 
-      <Section id="fiction" title="Fiction" eyebrow="Captivating stories" actionLabel="See more">
-        <div className="grid">
-          {attachCovers(fiction.length ? fiction : sampleBooks.filter((b) => isFictionCategory(b.category || b.badge))).map((book, idx) => (
-            <BookCard
-              key={`fic-${getKey(book)}-${idx}`}
-              book={book}
-              wishlisted={Boolean(wishlist[getKey(book)])}
-              onToggleWishlist={() => toggleWishlist(book)}
-              count={countFor(book)}
-              onInc={() => increment(book)}
-              onDec={() => decrement(book)}
+        <Route
+          path="/fiction"
+          element={(
+            <CategoryPage
+              title="Fiction"
+              eyebrow="Captivating stories"
+              books={fiction}
+              getKey={getKey}
+              wishlist={wishlist}
+              toggleWishlist={toggleWishlist}
+              countFor={countFor}
+              increment={increment}
+              decrement={decrement}
             />
-          ))}
-        </div>
-      </Section>
+          )}
+        />
 
-      <Section id="nonfiction" title="Non-Fiction" eyebrow="Inspiring insights" actionLabel="See more">
-        <div className="grid">
-          {attachCovers(nonfiction.length ? nonfiction : sampleBooks.filter((b) => isNonfictionCategory(b.category || b.badge))).map((book, idx) => (
-            <BookCard
-              key={`nf-${getKey(book)}-${idx}`}
-              book={book}
-              wishlisted={Boolean(wishlist[getKey(book)])}
-              onToggleWishlist={() => toggleWishlist(book)}
-              count={countFor(book)}
-              onInc={() => increment(book)}
-              onDec={() => decrement(book)}
+        <Route
+          path="/non-fiction"
+          element={(
+            <CategoryPage
+              title="Non-Fiction"
+              eyebrow="Inspiring insights"
+              books={nonfiction}
+              getKey={getKey}
+              wishlist={wishlist}
+              toggleWishlist={toggleWishlist}
+              countFor={countFor}
+              increment={increment}
+              decrement={decrement}
             />
-          ))}
-        </div>
-      </Section>
+          )}
+        />
 
-      <Section id="teens" title="Teens/Kids" eyebrow="For young readers" actionLabel="See more">
-        <div className="grid">
-          {teenBooks.map((book) => (
-            <BookCard
-              key={`teen-${getKey(book)}`}
-              book={book}
-              wishlisted={Boolean(wishlist[getKey(book)])}
-              onToggleWishlist={() => toggleWishlist(book)}
-              count={countFor(book)}
-              onInc={() => increment(book)}
-              onDec={() => decrement(book)}
+        <Route
+          path="/teens"
+          element={(
+            <CategoryPage
+              title="Teens/Kids"
+              eyebrow="For young readers"
+              books={teens}
+              getKey={getKey}
+              wishlist={wishlist}
+              toggleWishlist={toggleWishlist}
+              countFor={countFor}
+              increment={increment}
+              decrement={decrement}
             />
-          ))}
-        </div>
-      </Section>
+          )}
+        />
 
-      <Section id="audiobooks" title="Audiobooks" eyebrow="Listen on the go" actionLabel="See more">
-        <div className="grid">
-          {audiobookBooks.map((book) => (
-            <BookCard
-              key={`audio-${getKey(book)}`}
-              book={book}
-              wishlisted={Boolean(wishlist[getKey(book)])}
-              onToggleWishlist={() => toggleWishlist(book)}
-              count={countFor(book)}
-              onInc={() => increment(book)}
-              onDec={() => decrement(book)}
+        <Route
+          path="/audiobooks"
+          element={(
+            <CategoryPage
+              title="Audiobooks"
+              eyebrow="Listen on the go"
+              books={audiobooksList}
+              getKey={getKey}
+              wishlist={wishlist}
+              toggleWishlist={toggleWishlist}
+              countFor={countFor}
+              increment={increment}
+              decrement={decrement}
             />
-          ))}
-        </div>
-      </Section>
+          )}
+        />
 
-      <Section id="toys" title="Toys &amp; Games" eyebrow="Gifts and play" actionLabel="See more">
-        <div className="grid">
-          {toyItems.map((book) => (
-            <BookCard
-              key={`toy-${getKey(book)}`}
-              book={book}
-              wishlisted={Boolean(wishlist[getKey(book)])}
-              onToggleWishlist={() => toggleWishlist(book)}
-              count={countFor(book)}
-              onInc={() => increment(book)}
-              onDec={() => decrement(book)}
+        <Route
+          path="/toys"
+          element={(
+            <CategoryPage
+              title="Toys & Games"
+              eyebrow="Gifts and play"
+              books={toys}
+              getKey={getKey}
+              wishlist={wishlist}
+              toggleWishlist={toggleWishlist}
+              countFor={countFor}
+              increment={increment}
+              decrement={decrement}
             />
-          ))}
-        </div>
-      </Section>
+          )}
+        />
+      </Routes>
 
       {showCart ? <div className="cart-overlay" onClick={() => setShowCart(false)} /> : null}
 

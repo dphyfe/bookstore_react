@@ -31,6 +31,11 @@
 
 .brand-name {
   color: #f6f7fb;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
 }
 
 .top-actions {
