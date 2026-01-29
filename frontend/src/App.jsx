@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import './App.css'
 import BookCard from './components/BookCard'
@@ -369,8 +369,10 @@ function App() {
   const [orderMessage, setOrderMessage] = useState('')
   const [wishlist, setWishlist] = useState({})
   const [showWishlist, setShowWishlist] = useState(false)
+  const [showAccount, setShowAccount] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
+  const accountRef = useRef(null)
 
   const totalCount = useMemo(() => Object.values(counts).reduce((sum, n) => sum + n, 0), [counts])
 
@@ -454,6 +456,21 @@ function App() {
     load()
   }, [])
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (accountRef.current && !accountRef.current.contains(event.target)) {
+        setShowAccount(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  useEffect(() => {
+    setShowAccount(false)
+  }, [location.pathname])
+
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase()
     if (!term) return books
@@ -508,7 +525,29 @@ function App() {
           </button>
         </div>
         <div className="nav-actions">
-          <button className="ghost-btn" type="button">My Account</button>
+          <div className="account-wrapper" ref={accountRef}>
+            <button
+              className="ghost-btn account-btn"
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded={showAccount}
+              onClick={() => setShowAccount((prev) => !prev)}
+            >
+              My Account
+            </button>
+            {showAccount ? (
+              <div className="account-menu" role="menu" aria-label="Account">
+                <button className="account-action" type="button">Sign In</button>
+                <button className="account-link" type="button">Create an Account</button>
+                <div className="account-divider" />
+                <button className="account-link" type="button">Manage Account</button>
+                <button className="account-link" type="button">Order Status</button>
+                <button className="account-link" type="button">My Digital Library</button>
+                <button className="account-link" type="button">Address Book</button>
+                <button className="account-link" type="button">Payment Methods</button>
+              </div>
+            ) : null}
+          </div>
           <button className="ghost-btn wishlist-btn-top" type="button" onClick={() => setShowWishlist((prev) => !prev)}>
             Wishlist
             {wishlistItems.length > 0 ? (

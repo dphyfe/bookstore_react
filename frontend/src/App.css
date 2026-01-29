@@ -63,6 +63,60 @@
   gap: 8px;
 }
 
+.account-wrapper {
+  position: relative;
+}
+
+.account-btn {
+  min-width: 120px;
+}
+
+.account-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #0f152a;
+  border: 1px solid #1b2744;
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  padding: 10px;
+  width: 220px;
+  z-index: 15;
+  display: grid;
+  gap: 6px;
+}
+
+.account-action {
+  background: #245f4a;
+  color: #f6f7fb;
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.account-link {
+  background: none;
+  border: none;
+  color: #e5ecff;
+  text-align: left;
+  padding: 8px 6px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.account-link:hover,
+.account-action:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.account-divider {
+  height: 1px;
+  background: #1b2744;
+  margin: 4px 0;
+}
+
 .cart-btn {
   position: relative;
 }
