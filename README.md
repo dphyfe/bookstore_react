@@ -1,13 +1,23 @@
 # Burt's Bookshelf
 
-![Burt's Bookshelf UI](frontend/public/screenshots.png)
+Single-page book shop UI built with React + Django REST. The screenshot below is taken from the shipped demo state (hero + featured carousel + wishlist/cart controls).
+
+![Burt's Bookshelf UI](frontend/public/burts-bookshelf.png)
+
+## Snapshot
+- Hero banner with quick actions for featured and category browsing
+- Featured carousel with wishlist heart, quantity controls, and price/ratings badges
+- Category tabs across the header to jump between genres
+- Search bar ready to wire to server-side filtering
+
+> Save the provided screenshot to `frontend/public/burts-bookshelf.png` so it renders locally and on GitHub.
 
 ## What This Is
 A Vite-powered React experience paired with a Django REST API that serves book data. The frontend blends API-powered content with seeded/demo items so the UI stays rich even if the backend is empty or offline.
 
 ## How It Was Built
-- **Frontend (Vite + React 19):** Single-page app with `react-router-dom` 7 for navigation. Layout, hero, category sections, and cart/wishlist live in [frontend/src/App.jsx](frontend/src/App.jsx). Reusable book tiles are in [frontend/src/components/BookCard.jsx](frontend/src/components/BookCard.jsx), keeping UI logic (ratings, wishlist toggle, quantity controls) isolated from page state.
-- **Data flow:** On load, the app calls `GET /api/books/` (configurable via `VITE_API_BASE_URL`). Responses hydrate the catalog; if the API is empty or unavailable, the UI falls back to curated sample data and fills missing covers/prices to keep the layout intact. Wishlist and cart state are client-side (`useState`), with derived totals and badge counts in the header. A basic search box is stubbed; you can wire it to the same endpoint with server-side filtering.
+- **Frontend (Vite + React 19):** Single-page app with `react-router-dom` 7 for navigation. Layout, hero, category sections, and cart/wishlist live in [frontend/src/App.jsx](frontend/src/App.jsx). Reusable book tiles are in [frontend/src/components/BookCard.jsx](frontend/src/components/BookCard.jsx) to keep UI logic (ratings, wishlist toggle, quantity controls) isolated from page state.
+- **Data flow:** On load, the app calls `GET /api/books/` (configurable via `VITE_API_BASE_URL`). Responses hydrate the catalog; if the API is empty or unavailable, the UI falls back to curated sample data and fills missing covers/prices to keep the layout intact. Wishlist and cart state are client-side (`useState`), with derived totals and badge counts in the header. The search box is stubbed; wire it to the same endpoint with server-side filtering.
 - **Backend (Django 5 + DRF):** A minimal `Book` model ([backend/books/models.py](backend/books/models.py)) exposed through a DRF `ModelViewSet` ([backend/books/views.py](backend/books/views.py)). Default router wiring sits in [backend/books/urls.py](backend/books/urls.py). CORS is open to the Vite dev server, and DRF Spectacular is enabled for schema generation.
 - **Styling/UX:** Custom CSS in `App.css` drives the bookshelf aesthetic (hero banner, cards, badges, counters). Buttons and wishlist hearts are keyboard-accessible; counters announce quantity via `aria-live`.
 - **Developer ergonomics:** ESLint 9 baseline, Vite dev server with HMR, and DRF schema generation to keep frontend/back-end contracts visible.
@@ -29,11 +39,11 @@ Optional: set `VITE_API_BASE_URL` in a `.env` file (e.g., `http://localhost:8000
 6. Run the API: `python manage.py runserver`
 
 ## API Surface
-- `GET /api/books/` — list with search/order filters (title, author, category).
-- `POST /api/books/` — create.
-- `GET /api/books/{id}/` — retrieve.
-- `PATCH /api/books/{id}/` — update.
-- `DELETE /api/books/{id}/` — delete.
+- `GET /api/books/` — list with search/order filters (title, author, category)
+- `POST /api/books/` — create
+- `GET /api/books/{id}/` — retrieve
+- `PATCH /api/books/{id}/` — update
+- `DELETE /api/books/{id}/` — delete
 
 ## Design Notes
 - Frontend gracefully degrades: if the API is down, curated seed data keeps the catalog visible and prices/badges consistent.
@@ -45,6 +55,3 @@ Optional: set `VITE_API_BASE_URL` in a `.env` file (e.g., `http://localhost:8000
 - frontend/ — Vite + React SPA
 - backend/ — Django REST API (books app, DRF, Spectacular)
 - fastapi_app/ — FastAPI sandbox (optional experiments)
-
-## Image
-The hero/screenshot above expects a file at `frontend/public/screenshots.png`. Drop the provided PNG there to render it locally and on GitHub.
