@@ -1,5 +1,7 @@
 # Burt's Bookshelf
 
+Live demo: https://bookstore.dphyfe.com
+
 Single-page book shop UI built with React + Django REST. The screenshot below is taken from the shipped demo state (hero + featured carousel + wishlist/cart controls).
 
 ![Burt's Bookshelf UI](frontend/public/burts-bookshelf.png)
